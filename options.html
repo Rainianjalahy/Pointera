@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Magic Pointer — Configuration</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div class="hero-bg"></div>
+      <h1>
+        <span class="logo-dot"></span>
+        Magic Pointer
+      </h1>
+      <p class="tagline">Configurez votre curseur intelligent. Pointez. Demandez. Agissez.</p>
+    </header>
+
+    <main>
+      <!-- PROVIDER -->
+      <section class="card">
+        <h2>1. Choisir le moteur IA</h2>
+        <p class="hint">Mistral est recommandé : modèle européen, données en Europe, gratuit jusqu'à un certain seuil.</p>
+
+        <div class="provider-grid">
+          <label class="provider-option" data-provider="mistral">
+            <input type="radio" name="provider" value="mistral">
+            <div class="provider-card">
+              <div class="provider-flag">🇫🇷</div>
+              <div class="provider-name">Mistral AI</div>
+              <div class="provider-desc">Pixtral · vision multimodale · RGPD</div>
+            </div>
+          </label>
+
+          <label class="provider-option" data-provider="claude">
+            <input type="radio" name="provider" value="claude">
+            <div class="provider-card">
+              <div class="provider-flag">🇺🇸</div>
+              <div class="provider-name">Anthropic Claude</div>
+              <div class="provider-desc">Claude 3.5 Sonnet · vision avancée</div>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- MISTRAL CONFIG -->
+      <section class="card" id="mistral-config">
+        <h2>2. Clé API Mistral</h2>
+        <p class="hint">
+          Obtenez votre clé sur
+          <a href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener">console.mistral.ai/api-keys</a>
+        </p>
+
+        <div class="form-row">
+          <label for="mistralApiKey">Clé API</label>
+          <div class="input-with-action">
+            <input
+              type="password"
+              id="mistralApiKey"
+              placeholder="••••••••••••••••"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button type="button" class="toggle-visibility" data-target="mistralApiKey">👁</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="mistralModel">Modèle</label>
+          <select id="mistralModel">
+            <option value="pixtral-12b-2409">Pixtral 12B (vision, rapide, ~$0.15/M tokens)</option>
+            <option value="mistral-large-latest">Mistral Large (multimodal, plus puissant)</option>
+            <option value="mistral-small-latest">Mistral Small (économique)</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- CLAUDE CONFIG -->
+      <section class="card" id="claude-config">
+        <h2>2. Clé API Claude</h2>
+        <p class="hint">
+          Obtenez votre clé sur
+          <a href="https://console.anthropic.com/account/keys" target="_blank" rel="noopener">console.anthropic.com</a>
+        </p>
+
+        <div class="form-row">
+          <label for="claudeApiKey">Clé API</label>
+          <div class="input-with-action">
+            <input
+              type="password"
+              id="claudeApiKey"
+              placeholder="sk-ant-..."
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button type="button" class="toggle-visibility" data-target="claudeApiKey">👁</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="claudeModel">Modèle</label>
+          <select id="claudeModel">
+            <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (recommandé)</option>
+            <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku (rapide, économique)</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- PRÉFÉRENCES -->
+      <section class="card">
+        <h2>3. Préférences</h2>
+
+        <div class="form-row">
+          <label for="captureSize">Taille de la zone de capture</label>
+          <div class="range-row">
+            <input type="range" id="captureSize" min="200" max="900" step="50" value="500">
+            <span class="range-value" id="captureSizeValue">500px</span>
+          </div>
+          <p class="hint-sm">Zone capturée autour du curseur. Plus grande = plus de contexte.</p>
+        </div>
+
+        <div class="form-row checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="showOverlay" checked>
+            <span>Afficher l'encadré visuel autour du curseur quand actif</span>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label for="systemPrompt">Prompt système (optionnel)</label>
+          <textarea
+            id="systemPrompt"
+            placeholder="Ex : Tu es un assistant pour rédaction académique en français. Réponds toujours en français avec un ton scientifique."
+            rows="4"
+          ></textarea>
+          <p class="hint-sm">Contexte permanent fourni à l'IA. Utile pour personnaliser le ton.</p>
+        </div>
+      </section>
+
+      <!-- ACTIONS -->
+      <section class="actions">
+        <button id="testConnection" class="btn btn-secondary">🔌 Tester la connexion</button>
+        <button id="save" class="btn btn-primary">💾 Enregistrer</button>
+      </section>
+
+      <div id="status" class="status"></div>
+
+      <!-- HELP -->
+      <section class="card help">
+        <h2>Comment utiliser</h2>
+        <ol class="steps">
+          <li>
+            <strong>Activez Magic Pointer</strong> avec <kbd>Alt</kbd>+<kbd>M</kbd>
+            (ou clic-droit → « ✨ Magic Pointer »)
+          </li>
+          <li>
+            <strong>Tapez votre commande</strong> dans la boîte qui apparaît
+            (ou cliquez une suggestion)
+          </li>
+          <li>
+            <strong>L'IA analyse le contexte visuel</strong> autour de votre curseur
+            et répond en quelques secondes
+          </li>
+          <li>
+            <strong>Utilisez le résultat</strong> : Copier, Insérer, ou relancer
+          </li>
+        </ol>
+
+        <h3>Exemples de commandes</h3>
+        <div class="examples">
+          <code>Résume ce paragraphe en 3 points</code>
+          <code>Extrais les références bibliographiques</code>
+          <code>Convertis ce tableau en JSON</code>
+          <code>Traduis en français académique</code>
+          <code>Quelle est l'idée principale ?</code>
+          <code>Reformule plus clairement</code>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Magic Pointer · open source · vos clés API restent locales (chrome.storage)</p>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

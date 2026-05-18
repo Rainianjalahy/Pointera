@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "Magic Pointer",
+  "version": "1.0.0",
+  "description": "Curseur intelligent IA. Pointez du contenu, demandez en langage naturel. Compatible Mistral & Claude.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://api.mistral.ai/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["lib/html2canvas.min.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Magic Pointer — Alt+M pour activer",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "commands": {
+    "activate-magic-pointer": {
+      "suggested_key": {
+        "default": "Alt+M",
+        "mac": "Alt+M"
+      },
+      "description": "Activer Magic Pointer"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/html2canvas.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
