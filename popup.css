@@ -252,3 +252,96 @@ footer a:hover {
   margin: 0 8px;
   opacity: 0.4;
 }
+
+/* ============================================================
+   v1.1 : NOUVEAUX STYLES POPUP
+   ============================================================ */
+
+/* Grille de boutons d'action principaux */
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btn-action {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: center;
+}
+
+.btn-action:hover {
+  background: var(--bg-elevated);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.btn-action.btn-primary {
+  background: linear-gradient(135deg, rgba(255, 51, 102, 0.15), rgba(255, 107, 0, 0.1));
+  border-color: rgba(255, 51, 102, 0.3);
+}
+
+.btn-action.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(255, 51, 102, 0.25), rgba(255, 107, 0, 0.2));
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.2);
+}
+
+.btn-action-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.btn-action-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-action-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.btn-action-shortcut {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.btn-action-shortcut kbd {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.info-row {
+  background: rgba(255, 51, 102, 0.06);
+  border: 1px solid rgba(255, 51, 102, 0.15);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.info-row strong {
+  color: var(--text);
+  font-weight: 600;
+}

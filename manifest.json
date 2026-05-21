@@ -1,18 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Magic Pointer",
-  "version": "1.0.0",
-  "description": "Curseur intelligent IA. Pointez du contenu, demandez en langage naturel. Compatible Mistral & Claude.",
+  "version": "1.2.1",
+  "description": "Curseur intelligent IA. Sélection libre, commandes personnalisables, aperçu de liens, export Zotero. Compatible Mistral & Claude.",
   "permissions": [
     "storage",
     "activeTab",
     "scripting",
     "contextMenus",
-    "clipboardWrite"
+    "clipboardWrite",
+    "tabs"
   ],
   "host_permissions": [
     "https://api.mistral.ai/*",
-    "https://api.anthropic.com/*"
+    "https://api.anthropic.com/*",
+    "http://127.0.0.1:23119/*",
+    "http://localhost:23119/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js",
@@ -28,7 +32,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Magic Pointer — Alt+M pour activer",
+    "default_title": "Magic Pointer — Alt+M",
     "default_icon": {
       "16": "icons/icon-16.png",
       "48": "icons/icon-48.png",
@@ -47,7 +51,14 @@
         "default": "Alt+M",
         "mac": "Alt+M"
       },
-      "description": "Activer Magic Pointer"
+      "description": "Activer Magic Pointer (sélection)"
+    },
+    "capture-full-window": {
+      "suggested_key": {
+        "default": "Alt+W",
+        "mac": "Alt+W"
+      },
+      "description": "Capturer toute la fenêtre"
     }
   },
   "web_accessible_resources": [

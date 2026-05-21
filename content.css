@@ -680,3 +680,188 @@
     font-size: 10.5px;
   }
 }
+
+/* ============================================================
+   v1.1 : NOUVEAUX STYLES
+   ============================================================ */
+
+/* Bouton "Toute la page" dans la toolbar de sélection */
+.mp-btn-full {
+  background: rgba(255, 255, 255, 0.06);
+  color: #d0d0d5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px !important;
+}
+
+.mp-btn-full:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Badge du type de capture dans le header */
+.mp-kind-badge {
+  font-size: 11px;
+  background: rgba(255, 51, 102, 0.15);
+  color: #ff8aa8;
+  padding: 3px 8px;
+  border-radius: 5px;
+  margin-left: 8px;
+  border: 1px solid rgba(255, 51, 102, 0.2);
+  letter-spacing: 0.01em;
+}
+
+/* Aperçu de lien (remplace l'image de capture) */
+.mp-link-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+}
+
+.mp-link-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff3366, #ff6b00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(255, 51, 102, 0.3);
+}
+
+.mp-link-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mp-link-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #f5f5f7;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mp-link-url {
+  font-size: 11.5px;
+  color: #a0a0a8;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Action primaire (Aller au lien) en couleur accent */
+.mp-action-primary {
+  background: linear-gradient(135deg, #ff3366, #ff6b00) !important;
+  color: white !important;
+  border-color: transparent !important;
+  box-shadow: 0 2px 8px rgba(255, 51, 102, 0.3);
+}
+
+.mp-action-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.5);
+}
+
+/* Input de suivi (question additionnelle sur un lien) */
+.mp-followup-input {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   v1.2 : ZOTERO
+   ============================================================ */
+
+/* Bouton Zotero (utilise la couleur identitaire Zotero : rouge bordeaux) */
+.mp-action-zotero {
+  background: rgba(204, 41, 54, 0.12) !important;
+  border-color: rgba(204, 41, 54, 0.3) !important;
+  color: #ff8a96 !important;
+}
+
+.mp-action-zotero:hover {
+  background: rgba(204, 41, 54, 0.2) !important;
+  border-color: rgba(204, 41, 54, 0.5) !important;
+  color: #ffa8b3 !important;
+}
+
+/* Toast Zotero (notifications de sauvegarde) */
+.mp-zotero-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  background: #0d0d0f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 20px;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: mp-zotero-toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  max-width: 400px;
+  text-align: center;
+}
+
+.mp-zotero-toast-out {
+  animation: mp-zotero-toast-out 0.3s ease-out forwards;
+}
+
+@keyframes mp-zotero-toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes mp-zotero-toast-out {
+  to { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+.mp-zotero-toast-success {
+  border-color: rgba(74, 222, 128, 0.3);
+  background: linear-gradient(180deg, rgba(74, 222, 128, 0.08), rgba(13, 13, 15, 1));
+}
+
+.mp-zotero-toast-error {
+  border-color: rgba(255, 107, 107, 0.3);
+  background: linear-gradient(180deg, rgba(255, 107, 107, 0.08), rgba(13, 13, 15, 1));
+  color: #ffb0b0;
+}
+
+.mp-zotero-toast-loading {
+  border-color: rgba(204, 41, 54, 0.3);
+  background: linear-gradient(180deg, rgba(204, 41, 54, 0.1), rgba(13, 13, 15, 1));
+}
+
+.mp-zotero-toast-loading::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #cc2936;
+  border-radius: 50%;
+  animation: mp-spin 0.6s linear infinite;
+}

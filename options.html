@@ -8,7 +8,6 @@
 <body>
   <div class="container">
     <header class="hero">
-      <div class="hero-bg"></div>
       <h1>
         <span class="logo-dot"></span>
         Magic Pointer
@@ -19,8 +18,8 @@
     <main>
       <!-- PROVIDER -->
       <section class="card">
-        <h2>1. Choisir le moteur IA</h2>
-        <p class="hint">Mistral est recommandé : modèle européen, données en Europe, gratuit jusqu'à un certain seuil.</p>
+        <h2>1. Moteur IA</h2>
+        <p class="hint">Mistral est recommandé : européen, RGPD, gratuit à l'usage modéré.</p>
 
         <div class="provider-grid">
           <label class="provider-option" data-provider="mistral">
@@ -28,7 +27,7 @@
             <div class="provider-card">
               <div class="provider-flag">🇫🇷</div>
               <div class="provider-name">Mistral AI</div>
-              <div class="provider-desc">Pixtral · vision multimodale · RGPD</div>
+              <div class="provider-desc">Pixtral · vision · RGPD</div>
             </div>
           </label>
 
@@ -37,7 +36,7 @@
             <div class="provider-card">
               <div class="provider-flag">🇺🇸</div>
               <div class="provider-name">Anthropic Claude</div>
-              <div class="provider-desc">Claude 3.5 Sonnet · vision avancée</div>
+              <div class="provider-desc">3.5 Sonnet · vision avancée</div>
             </div>
           </label>
         </div>
@@ -45,22 +44,13 @@
 
       <!-- MISTRAL CONFIG -->
       <section class="card" id="mistral-config">
-        <h2>2. Clé API Mistral</h2>
-        <p class="hint">
-          Obtenez votre clé sur
-          <a href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener">console.mistral.ai/api-keys</a>
-        </p>
+        <h2>Clé API Mistral</h2>
+        <p class="hint">Obtenez-la sur <a href="https://console.mistral.ai/api-keys/" target="_blank">console.mistral.ai/api-keys</a></p>
 
         <div class="form-row">
           <label for="mistralApiKey">Clé API</label>
           <div class="input-with-action">
-            <input
-              type="password"
-              id="mistralApiKey"
-              placeholder="••••••••••••••••"
-              autocomplete="off"
-              spellcheck="false"
-            >
+            <input type="password" id="mistralApiKey" placeholder="••••••••••••••••" autocomplete="off" spellcheck="false">
             <button type="button" class="toggle-visibility" data-target="mistralApiKey">👁</button>
           </div>
         </div>
@@ -68,8 +58,8 @@
         <div class="form-row">
           <label for="mistralModel">Modèle</label>
           <select id="mistralModel">
-            <option value="pixtral-12b-2409">Pixtral 12B (vision, rapide, ~$0.15/M tokens)</option>
-            <option value="mistral-large-latest">Mistral Large (multimodal, plus puissant)</option>
+            <option value="pixtral-12b-2409">Pixtral 12B (vision, rapide)</option>
+            <option value="mistral-large-latest">Mistral Large (multimodal puissant)</option>
             <option value="mistral-small-latest">Mistral Small (économique)</option>
           </select>
         </div>
@@ -77,22 +67,13 @@
 
       <!-- CLAUDE CONFIG -->
       <section class="card" id="claude-config">
-        <h2>2. Clé API Claude</h2>
-        <p class="hint">
-          Obtenez votre clé sur
-          <a href="https://console.anthropic.com/account/keys" target="_blank" rel="noopener">console.anthropic.com</a>
-        </p>
+        <h2>Clé API Claude</h2>
+        <p class="hint">Obtenez-la sur <a href="https://console.anthropic.com/account/keys" target="_blank">console.anthropic.com</a></p>
 
         <div class="form-row">
           <label for="claudeApiKey">Clé API</label>
           <div class="input-with-action">
-            <input
-              type="password"
-              id="claudeApiKey"
-              placeholder="sk-ant-..."
-              autocomplete="off"
-              spellcheck="false"
-            >
+            <input type="password" id="claudeApiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
             <button type="button" class="toggle-visibility" data-target="claudeApiKey">👁</button>
           </div>
         </div>
@@ -100,10 +81,72 @@
         <div class="form-row">
           <label for="claudeModel">Modèle</label>
           <select id="claudeModel">
-            <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (recommandé)</option>
-            <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku (rapide, économique)</option>
+            <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+            <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
           </select>
         </div>
+      </section>
+
+      <!-- NEW: COMMANDES PERSONNALISÉES -->
+      <section class="card">
+        <h2>2. Mes commandes</h2>
+        <p class="hint">
+          Créez votre bibliothèque de prompts. Apparaissent comme boutons rapides dans le panneau Magic Pointer.
+        </p>
+
+        <div id="prompts-list" class="prompts-list">
+          <!-- Rempli dynamiquement -->
+        </div>
+
+        <div class="prompts-actions">
+          <button id="add-prompt" class="btn btn-secondary">+ Ajouter une commande</button>
+          <button id="reset-prompts" class="btn btn-ghost" title="Restaurer les commandes par défaut">
+            ↻ Restaurer les défauts
+          </button>
+        </div>
+      </section>
+
+      <!-- NEW v1.2 : ZOTERO -->
+      <section class="card">
+        <h2>📚 Zotero (export automatique)</h2>
+        <p class="hint">
+          Sauvegardez les pages que vous lisez directement dans Zotero. Nécessite Zotero ouvert sur votre ordinateur (l'application desktop).
+        </p>
+
+        <div class="zotero-status-card" id="zoteroStatus">
+          <div class="zotero-status-indicator" id="zoteroStatusDot"></div>
+          <div class="zotero-status-text">
+            <div class="zotero-status-title" id="zoteroStatusTitle">État inconnu</div>
+            <div class="zotero-status-detail" id="zoteroStatusDetail">Cliquez sur "Tester" ci-dessous</div>
+          </div>
+          <button id="testZotero" class="btn btn-secondary btn-sm">🔌 Tester</button>
+        </div>
+
+        <div class="form-row">
+          <label for="zoteroAutoTag">Tags automatiques (optionnel)</label>
+          <input type="text" id="zoteroAutoTag" placeholder="magic-pointer, à-lire, thèse">
+          <p class="hint-sm">Tags ajoutés à chaque item sauvé. Séparez par virgules.</p>
+        </div>
+
+        <div class="form-row checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="zoteroAutoNote" checked>
+            <span>Inclure le résultat IA dans le champ "Résumé" de Zotero (quand disponible)</span>
+          </label>
+        </div>
+
+        <details class="zotero-help">
+          <summary>Comment ça marche ?</summary>
+          <ol>
+            <li>Ouvrez Zotero (application desktop)</li>
+            <li>Clic droit sur une page → <strong>📚 Sauver cette page dans Zotero</strong></li>
+            <li>Magic Pointer détecte automatiquement les <strong>articles scientifiques</strong> (DOI, journal, auteurs) via les meta tags standards (citation_*)</li>
+            <li>L'item apparaît instantanément dans Zotero — collection sélectionnée</li>
+          </ol>
+          <p class="hint-sm">
+            Pour articles scientifiques, Magic Pointer extrait automatiquement : titre, auteurs, journal, DOI, volume, pages, ISSN, date, résumé.
+          </p>
+        </details>
       </section>
 
       <!-- PRÉFÉRENCES -->
@@ -111,28 +154,17 @@
         <h2>3. Préférences</h2>
 
         <div class="form-row">
-          <label for="captureSize">Taille de la zone de capture</label>
+          <label for="captureSize">Taille initiale de la zone</label>
           <div class="range-row">
             <input type="range" id="captureSize" min="200" max="900" step="50" value="500">
             <span class="range-value" id="captureSizeValue">500px</span>
           </div>
-          <p class="hint-sm">Zone capturée autour du curseur. Plus grande = plus de contexte.</p>
-        </div>
-
-        <div class="form-row checkbox-row">
-          <label class="checkbox-label">
-            <input type="checkbox" id="showOverlay" checked>
-            <span>Afficher l'encadré visuel autour du curseur quand actif</span>
-          </label>
+          <p class="hint-sm">Taille au moment où la zone apparaît. Reste ajustable manuellement.</p>
         </div>
 
         <div class="form-row">
           <label for="systemPrompt">Prompt système (optionnel)</label>
-          <textarea
-            id="systemPrompt"
-            placeholder="Ex : Tu es un assistant pour rédaction académique en français. Réponds toujours en français avec un ton scientifique."
-            rows="4"
-          ></textarea>
+          <textarea id="systemPrompt" placeholder="Ex : Tu es un assistant pour ma thèse de master en entrepreneuriat. Réponds en français académique impersonnel et hedgé." rows="4"></textarea>
           <p class="hint-sm">Contexte permanent fourni à l'IA. Utile pour personnaliser le ton.</p>
         </div>
       </section>
@@ -140,48 +172,40 @@
       <!-- ACTIONS -->
       <section class="actions">
         <button id="testConnection" class="btn btn-secondary">🔌 Tester la connexion</button>
-        <button id="save" class="btn btn-primary">💾 Enregistrer</button>
+        <button id="save" class="btn btn-primary">💾 Enregistrer tout</button>
       </section>
 
       <div id="status" class="status"></div>
 
       <!-- HELP -->
       <section class="card help">
-        <h2>Comment utiliser</h2>
-        <ol class="steps">
-          <li>
-            <strong>Activez Magic Pointer</strong> avec <kbd>Alt</kbd>+<kbd>M</kbd>
-            (ou clic-droit → « ✨ Magic Pointer »)
-          </li>
-          <li>
-            <strong>Tapez votre commande</strong> dans la boîte qui apparaît
-            (ou cliquez une suggestion)
-          </li>
-          <li>
-            <strong>L'IA analyse le contexte visuel</strong> autour de votre curseur
-            et répond en quelques secondes
-          </li>
-          <li>
-            <strong>Utilisez le résultat</strong> : Copier, Insérer, ou relancer
-          </li>
-        </ol>
-
-        <h3>Exemples de commandes</h3>
-        <div class="examples">
-          <code>Résume ce paragraphe en 3 points</code>
-          <code>Extrais les références bibliographiques</code>
-          <code>Convertis ce tableau en JSON</code>
-          <code>Traduis en français académique</code>
-          <code>Quelle est l'idée principale ?</code>
-          <code>Reformule plus clairement</code>
-        </div>
+        <h2>Raccourcis</h2>
+        <table class="shortcuts">
+          <tr><td><kbd>Alt</kbd>+<kbd>M</kbd></td><td>Sélection interactive</td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>W</kbd></td><td>Capturer toute la fenêtre</td></tr>
+          <tr><td>Clic droit → 🔍</td><td>Aperçu IA d'un lien</td></tr>
+          <tr><td>Clic droit → ✨</td><td>Analyser sélection / image / page</td></tr>
+          <tr><td>Clic droit → 📚</td><td>Sauver dans Zotero (page ou lien)</td></tr>
+        </table>
       </section>
     </main>
 
     <footer>
-      <p>Magic Pointer · open source · vos clés API restent locales (chrome.storage)</p>
+      <p>Magic Pointer v1.1 · open source · vos clés API restent locales</p>
     </footer>
   </div>
+
+  <!-- Template pour un prompt (utilisé en JS) -->
+  <template id="prompt-template">
+    <div class="prompt-item" data-id="">
+      <div class="prompt-display">
+        <input class="prompt-emoji" type="text" maxlength="2" value="⚡">
+        <input class="prompt-title" type="text" placeholder="Titre court (ex: Résumer)">
+        <input class="prompt-text" type="text" placeholder="Texte du prompt envoyé à l'IA…">
+        <button class="prompt-delete" title="Supprimer">🗑️</button>
+      </div>
+    </div>
+  </template>
 
   <script src="options.js"></script>
 </body>

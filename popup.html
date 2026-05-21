@@ -12,7 +12,7 @@
         <span class="logo-dot"></span>
         <span class="logo-text">Magic Pointer</span>
       </div>
-      <div class="version">v1.0</div>
+      <div class="version">v1.1</div>
     </header>
 
     <main>
@@ -30,20 +30,32 @@
         <div class="provider-model" id="providerModel">—</div>
       </div>
 
-      <button class="btn-activate" id="activate">
-        <span class="kbd">Alt</span>
-        <span class="plus">+</span>
-        <span class="kbd">M</span>
-        <span class="label">pour activer</span>
-      </button>
+      <!-- Boutons d'action principaux -->
+      <div class="actions-grid">
+        <button class="btn-action btn-primary" id="activate">
+          <div class="btn-action-icon">✂️</div>
+          <div class="btn-action-content">
+            <div class="btn-action-title">Sélection</div>
+            <div class="btn-action-shortcut"><kbd>Alt</kbd>+<kbd>M</kbd></div>
+          </div>
+        </button>
+
+        <button class="btn-action" id="captureFull">
+          <div class="btn-action-icon">📐</div>
+          <div class="btn-action-content">
+            <div class="btn-action-title">Toute la page</div>
+            <div class="btn-action-shortcut"><kbd>Alt</kbd>+<kbd>W</kbd></div>
+          </div>
+        </button>
+      </div>
+
+      <div class="info-row">
+        💡 Clic droit sur un lien → 🔍 <strong>Aperçu IA</strong>
+      </div>
 
       <div class="quick-actions">
-        <button class="action-btn" id="openOptions">
-          ⚙️ Configuration
-        </button>
-        <button class="action-btn" id="changeProvider">
-          🔄 Changer de moteur
-        </button>
+        <button class="action-btn" id="openOptions">⚙️ Configuration</button>
+        <button class="action-btn" id="changeProvider">🔄 Changer moteur</button>
       </div>
     </main>
 
