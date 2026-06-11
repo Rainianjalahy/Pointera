@@ -34,6 +34,10 @@
     lastCapture: null,
     pendingCommand: null,
 
+    // NEW v1.4 : sélection intelligente
+    smartChain: null,   // chaîne d'ancêtres capturables sous le curseur
+    smartIndex: -1,     // index courant dans la chaîne (Tab/Shift+Tab)
+
     // Pour l'inspecteur de liens
     currentLinkUrl: null
   };
@@ -81,6 +85,22 @@
     }
 
     if (state.mode === 'selecting') {
+      // NEW v1.4 : Tab = élargir au parent, Shift+Tab = réduire à l'enfant
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (state.smartChain && state.smartChain.length) {
+          if (e.shiftKey) {
+            state.smartIndex = Math.max(0, state.smartIndex - 1);
+          } else {
+            state.smartIndex = Math.min(state.smartChain.length - 1, state.smartIndex + 1);
+          }
+          applySmartBox();
+          updateSelectionUI();
+        }
+        return;
+      }
+
       const step = e.shiftKey ? 10 : 1;
       let handled = false;
 
@@ -99,6 +119,7 @@
 
       if (handled) {
         e.preventDefault();
+        // Un ajustement manuel sort du mode "snappé" (les dims deviennent libres)
         clampBox();
         updateSelectionUI();
       }
@@ -137,20 +158,159 @@
   });
 
   // ============================================================
+  // NEW v1.4 : SÉLECTION INTELLIGENTE
+  // ============================================================
+
+  /**
+   * Tags sémantiques avec bonus de score : ce sont les blocs que
+   * l'utilisateur veut généralement capturer.
+   */
+  const SMART_TAG_SCORES = {
+    TABLE: 50, FIGURE: 50, IMG: 45, VIDEO: 45, PRE: 45, SVG: 40,
+    BLOCKQUOTE: 40, ARTICLE: 30, P: 28, UL: 25, OL: 25, DL: 22,
+    SECTION: 15, MAIN: 10, H1: 20, H2: 18, H3: 16, CODE: 30,
+    CANVAS: 40, MATH: 45
+  };
+
+  /** Tags inline à ignorer : on remonte au parent bloc. */
+  const INLINE_TAGS = new Set([
+    'SPAN', 'A', 'B', 'I', 'EM', 'STRONG', 'SMALL', 'SUB', 'SUP',
+    'MARK', 'ABBR', 'CITE', 'Q', 'TIME', 'LABEL', 'TD', 'TH', 'TR',
+    'LI', 'BR', 'WBR'
+  ]);
+
+  /**
+   * Score un élément candidat : plus c'est haut, plus il est probable
+   * que l'utilisateur veuille le capturer.
+   */
+  function scoreCandidate(el, rect) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Rejets durs
+    if (rect.width < 60 || rect.height < 24) return -1;               // trop petit
+    if (rect.width > vw * 0.98 && rect.height > vh * 0.95) return -1; // toute la page
+    if (rect.bottom < 0 || rect.top > vh) return -1;                  // hors écran
+
+    let score = SMART_TAG_SCORES[el.tagName] || 0;
+
+    // Bonus densité de texte (un vrai paragraphe vs un wrapper vide)
+    const textLen = (el.innerText || '').trim().length;
+    if (textLen > 80) score += Math.min(25, textLen / 40);
+
+    // Bonus taille "raisonnable" (ni minuscule ni géante)
+    const areaRatio = (rect.width * rect.height) / (vw * vh);
+    if (areaRatio > 0.02 && areaRatio < 0.6) score += 15;
+    if (areaRatio >= 0.6) score -= (areaRatio - 0.6) * 60;
+
+    // Indices dans classes/id/role
+    const hint = ((typeof el.className === 'string' ? el.className : '') + ' '
+      + (el.id || '') + ' ' + (el.getAttribute('role') || '')).toLowerCase();
+    if (/abstract|summary|highlight|caption|figure|table|content|article|excerpt/.test(hint)) score += 20;
+    if (/nav|menu|footer|header|sidebar|cookie|banner|ad[s-]|popup/.test(hint)) score -= 40;
+
+    return score;
+  }
+
+  /**
+   * Trouve le meilleur bloc sous (x, y) et construit la chaîne
+   * d'ancêtres capturables (pour Tab/Shift+Tab).
+   * Retourne { chain, index } ou null.
+   */
+  function findSmartTarget(x, y) {
+    let el = document.elementFromPoint(x, y);
+    if (!el || el === document.body || el === document.documentElement) return null;
+    if (el.closest('.mp-selection-root, .mp-panel')) return null;
+
+    const chain = [];
+    let node = el;
+    while (node && node !== document.body && chain.length < 12) {
+      const rect = node.getBoundingClientRect();
+      const isSmallInline = INLINE_TAGS.has(node.tagName) && rect.height < 40;
+
+      if (!isSmallInline) {
+        const score = scoreCandidate(node, rect);
+        if (score >= 0) {
+          // Fusionner les wrappers de taille quasi identique
+          const prev = chain[chain.length - 1];
+          const dup = prev && Math.abs(prev.rect.width - rect.width) < 8
+                           && Math.abs(prev.rect.height - rect.height) < 8;
+          if (dup) {
+            if (score > prev.score) chain[chain.length - 1] = { el: node, rect, score };
+          } else {
+            chain.push({ el: node, rect, score });
+          }
+        }
+      }
+      node = node.parentElement;
+    }
+
+    if (!chain.length) return null;
+
+    let bestIdx = 0;
+    for (let i = 1; i < chain.length; i++) {
+      if (chain[i].score > chain[bestIdx].score) bestIdx = i;
+    }
+    return { chain, index: bestIdx };
+  }
+
+  /** Applique l'entrée de chaîne courante à state.box (avec padding). */
+  function applySmartBox() {
+    const entry = state.smartChain?.[state.smartIndex];
+    if (!entry) return false;
+    const r = entry.el.getBoundingClientRect();  // re-lire (layout peut bouger)
+    const PAD = 8;
+    state.box = {
+      x: r.left - PAD,
+      y: r.top - PAD,
+      w: r.width + 2 * PAD,
+      h: r.height + 2 * PAD
+    };
+    clampBox();
+    return true;
+  }
+
+  /** Snap la zone sur l'élément sous (x, y). Retourne true si réussi. */
+  function smartSnapAt(x, y) {
+    const target = findSmartTarget(x, y);
+    if (!target) {
+      state.smartChain = null;
+      state.smartIndex = -1;
+      return false;
+    }
+    state.smartChain = target.chain;
+    state.smartIndex = target.index;
+    return applySmartBox();
+  }
+
+  /** Libellé court de l'élément snappé (pour le compteur de dims). */
+  function smartLabel() {
+    const entry = state.smartChain?.[state.smartIndex];
+    if (!entry) return null;
+    return entry.el.tagName.toLowerCase();
+  }
+
+  // ============================================================
   // MODE SÉLECTION (inchangé hormis le bouton "Toute la page")
   // ============================================================
 
   function enterSelectionMode(preselectedText) {
     state.mode = 'selecting';
 
-    const w = Math.min(state.captureSize, window.innerWidth - 40);
-    const h = Math.min(state.captureSize, window.innerHeight - 40);
-    state.box = {
-      x: Math.max(20, state.mouseX - w / 2),
-      y: Math.max(20, state.mouseY - h / 2),
-      w, h
-    };
-    clampBox();
+    // NEW v1.4 : tenter le snap intelligent sur l'élément sous le curseur
+    const snapped = smartSnapAt(state.mouseX, state.mouseY);
+
+    if (!snapped) {
+      // Fallback : boîte de taille fixe centrée sur le curseur
+      const w = Math.min(state.captureSize, window.innerWidth - 40);
+      const h = Math.min(state.captureSize, window.innerHeight - 40);
+      state.box = {
+        x: Math.max(20, state.mouseX - w / 2),
+        y: Math.max(20, state.mouseY - h / 2),
+        w, h
+      };
+      clampBox();
+    }
 
     state.selectionUI = document.createElement('div');
     state.selectionUI.className = 'mp-selection-root';
@@ -169,7 +329,7 @@
       </div>
       <div class="mp-selection-toolbar">
         <div class="mp-toolbar-hint">
-          <kbd>↵</kbd> capturer · <kbd>Esc</kbd> annuler · <kbd>↑↓←→</kbd> bouger · <kbd>Alt</kbd>+flèches resize
+          <kbd>↵</kbd> capturer · <kbd>Esc</kbd> annuler · <kbd>Tab</kbd> élargir / <kbd>⇧Tab</kbd> réduire · double-clic = cibler un bloc · <kbd>↑↓←→</kbd> ajuster
         </div>
         <div class="mp-toolbar-actions">
           <button class="mp-toolbar-btn mp-btn-cancel" id="mp-cancel">Annuler</button>
@@ -211,7 +371,10 @@
     box.style.height = state.box.h + 'px';
 
     const dims = state.selectionUI.querySelector('#mp-dims');
-    dims.textContent = `${Math.round(state.box.w)} × ${Math.round(state.box.h)}`;
+    const label = smartLabel();
+    dims.textContent = label
+      ? `🎯 ${label} · ${Math.round(state.box.w)} × ${Math.round(state.box.h)}`
+      : `${Math.round(state.box.w)} × ${Math.round(state.box.h)}`;
 
     const toolbar = state.selectionUI.querySelector('.mp-selection-toolbar');
     const toolbarH = 100;
@@ -260,6 +423,15 @@
       startNewSelection(e);
     });
 
+    // NEW v1.4 : double-clic dans la zone sombre = snap intelligent à cet endroit
+    dimOverlay.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (smartSnapAt(e.clientX, e.clientY)) {
+        updateSelectionUI();
+      }
+    });
+
     ui.querySelector('#mp-confirm').addEventListener('click', confirmSelection);
     ui.querySelector('#mp-cancel').addEventListener('click', deactivate);
     // NEW : bouton "Toute la page"
@@ -270,6 +442,7 @@
   }
 
   function startDrag(e) {
+    state.smartChain = null; state.smartIndex = -1;  // ajustement manuel = sortie du snap
     const startX = e.clientX;
     const startY = e.clientY;
     const startBox = { ...state.box };
@@ -291,6 +464,7 @@
   }
 
   function startResize(e, dir) {
+    state.smartChain = null; state.smartIndex = -1;  // ajustement manuel = sortie du snap
     const startX = e.clientX;
     const startY = e.clientY;
     const startBox = { ...state.box };
@@ -332,6 +506,7 @@
   }
 
   function startNewSelection(e) {
+    state.smartChain = null; state.smartIndex = -1;  // ajustement manuel = sortie du snap
     const startX = e.clientX;
     const startY = e.clientY;
     document.body.style.cursor = 'crosshair';
@@ -522,6 +697,8 @@
     if (state.panel) { state.panel.remove(); state.panel = null; }
     state.pendingCommand = null;
     state.currentLinkUrl = null;
+    state.smartChain = null;
+    state.smartIndex = -1;
     document.body.style.cursor = '';
   }
 
@@ -863,6 +1040,55 @@
   // ============================================================
 
   /**
+   * Détecte l'URL du PDF de l'article courant.
+   * Stratégies, dans l'ordre :
+   *   1. La page elle-même EST un PDF
+   *   2. Meta tag citation_pdf_url (norme Google Scholar)
+   *   3. <link rel="alternate" type="application/pdf">
+   *   4. Sélecteurs spécifiques (Nature, ACM, IEEE, etc.)
+   *   5. Premier lien .pdf direct visible
+   */
+  function extractPdfUrl() {
+    // 1. La page est un PDF
+    if (document.contentType === 'application/pdf'
+        || window.location.pathname.toLowerCase().endsWith('.pdf')) {
+      return window.location.href;
+    }
+
+    // 2. citation_pdf_url (norme académique standard)
+    const pdfMeta = document.querySelector('meta[name="citation_pdf_url" i]');
+    if (pdfMeta?.content) {
+      try { return new URL(pdfMeta.content, window.location.href).href; } catch {}
+    }
+
+    // 3. <link rel="alternate" type="application/pdf">
+    const altLink = document.querySelector('link[rel="alternate"][type="application/pdf"]');
+    if (altLink?.href) return altLink.href;
+
+    // 4. Sélecteurs site-spécifiques (les plus communs)
+    const siteSelectors = [
+      'a[data-track-action="download pdf"]',           // Nature, Springer
+      'a.pdf-link, a.download-pdf',                    // SAGE, Wiley
+      'a[href*="/doi/pdf/"]',                          // Wiley, IEEE
+      'a[href*="/article/pdf/"]',                      // Cairn, Érudit
+      'a[aria-label*="PDF" i][href]',                  // generic
+      'a[title*="PDF" i][href]'                        // generic
+    ];
+    for (const sel of siteSelectors) {
+      const link = document.querySelector(sel);
+      if (link?.href) {
+        try { return new URL(link.href, window.location.href).href; } catch {}
+      }
+    }
+
+    // 5. Lien direct se terminant par .pdf
+    const directLink = document.querySelector('a[href$=".pdf"], a[href*=".pdf?"]');
+    if (directLink?.href) return directLink.href;
+
+    return null;
+  }
+
+  /**
    * Extrait les métadonnées scholarly d'une page via les meta tags.
    * Reconnaît le standard Google Scholar (citation_*) et OpenGraph.
    */
@@ -973,6 +1199,8 @@
     showZoteroToast('📚 Envoi vers Zotero…', 'loading');
 
     const metadata = extractScholarlyMetadata();
+    const pdfUrl = extractPdfUrl();
+    if (pdfUrl) metadata.pdfUrl = pdfUrl;
 
     // Si on a un résultat IA dans le panneau ouvert, l'inclure
     let aiNote = null;
@@ -993,8 +1221,12 @@
       });
 
       if (response.success) {
+        const hasPdf = response.data.hasPdf;
+        const itemLabel = response.data.itemType === 'journalArticle' ? 'article' : 'page web';
         showZoteroToast(
-          `✓ Sauvé dans Zotero (${response.data.itemType === 'journalArticle' ? 'article' : 'page web'})`,
+          hasPdf
+            ? `✓ Sauvé dans Zotero (${itemLabel} + PDF)`
+            : `✓ Sauvé dans Zotero (${itemLabel})`,
           'success'
         );
       } else {

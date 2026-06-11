@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Magic Pointer",
-  "version": "1.2.1",
+  "version": "1.4.0",
   "description": "Curseur intelligent IA. Sélection libre, commandes personnalisables, aperçu de liens, export Zotero. Compatible Mistral & Claude.",
   "permissions": [
     "storage",

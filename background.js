@@ -574,6 +574,17 @@ async function saveToZotero({ metadata, aiNote, pageUrl, tags = [] }) {
   if (metadata.publisher) item.publisher = metadata.publisher;
   if (metadata.language) item.language = metadata.language;
 
+  // NEW v1.3 : attacher le PDF si détecté
+  // Zotero télécharge lui-même via cette URL
+  if (metadata.pdfUrl) {
+    item.attachments = [{
+      title: 'Full Text PDF',
+      url: metadata.pdfUrl,
+      mimeType: 'application/pdf',
+      snapshot: false  // pas un snapshot HTML, c'est un fichier direct
+    }];
+  }
+
   // Abstract : combiner métadonnée + note IA
   const abstractParts = [];
   if (metadata.abstractNote) abstractParts.push(metadata.abstractNote);
@@ -626,6 +637,7 @@ async function saveToZotero({ metadata, aiNote, pageUrl, tags = [] }) {
     ok: true,
     itemType: item.itemType,
     title: item.title,
+    hasPdf: !!metadata.pdfUrl,
     response: responseData
   };
 }

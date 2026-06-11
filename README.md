@@ -17,7 +17,6 @@ Quand vous appuyez sur **`Alt+M`**, vous entrez en mode sélection, similaire à
 - 📏 **Dimensions live** : affichage en temps réel des dimensions
 - 🎨 **Règle des tiers** : grille de composition pour aligner visuellement
 - 🔄 **Re-sélectionner** : bouton dans le panneau pour ajuster après capture
-- Connection avec Zotero
 
 ---
 
